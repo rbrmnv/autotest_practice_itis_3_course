@@ -4,7 +4,6 @@ import com.example.UntitledTestSuite.base.ApplicationManager;
 import com.example.UntitledTestSuite.base.HelperBase;
 import com.example.UntitledTestSuite.model.OrderAdressData;
 import org.openqa.selenium.By;
-import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -73,36 +72,28 @@ public class OrderHelper extends HelperBase {
     }
 
     public void confirmOrder() {
-
-        clickContinueGlobal();
-
-        clickIfPresent(By.xpath("//div[@id='shipping-buttons-container']//input"));
-        clickIfPresent(By.xpath("//div[@id='shipping-method-buttons-container']//input"));
-        clickIfPresent(By.xpath("//div[@id='payment-method-buttons-container']//input"));
-        clickIfPresent(By.xpath("//div[@id='payment-info-buttons-container']//input"));
-
-        clickIfPresent(By.xpath("//input[@value='Confirm']"));
+        waitAndClick(By.xpath("//div[@id='shipping-buttons-container']/input"));
+        waitAndClick(By.xpath("//div[@id='shipping-method-buttons-container']/input"));
+        waitAndClick(By.xpath("//div[@id='payment-method-buttons-container']/input"));
+        waitAndClick(By.xpath("//div[@id='payment-info-buttons-container']/input"));
+        waitAndClick(By.xpath("//input[@value='Confirm']"));
+        wait.until(ExpectedConditions.urlContains("checkout/completed"));
     }
 
-    private void clickContinueGlobal() {
-        try {
-            WebElement btn = driver.findElement(By.xpath("//input[@value='Continue']"));
-
-            if (btn.isDisplayed() && btn.isEnabled()) {
-                btn.click();
-            }
-        } catch (Exception ignored) {
-        }
+    private void waitAndClick(By locator) {
+        wait.until(ExpectedConditions.elementToBeClickable(locator)).click();
     }
 
-    private void clickIfPresent(By locator) {
-        try {
-            WebElement el = driver.findElement(locator);
+    public void removeItemFromCart() {
+        driver.findElement(By.xpath("//li[@id='topcartlink']/a/span")).click();
+        driver.findElement(By.name("removefromcart")).click();
+        driver.findElement(By.name("updatecart")).click();
+    }
 
-            if (el.isDisplayed() && el.isEnabled()) {
-                el.click();
-            }
-        } catch (Exception ignored) {
-        }
+    public boolean isCartEmpty() {
+        String bodyText = driver.findElement(
+                By.cssSelector(".order-summary-content")
+        ).getText();
+        return bodyText.contains("Your Shopping Cart is empty!");
     }
 }

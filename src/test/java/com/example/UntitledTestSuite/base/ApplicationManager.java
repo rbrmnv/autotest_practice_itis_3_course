@@ -6,6 +6,8 @@ import org.openqa.selenium.chrome.ChromeDriver;
 
 public class ApplicationManager {
 
+    private static ThreadLocal<ApplicationManager> app = new ThreadLocal<>();
+
     private WebDriver driver;
     private String baseUrl;
 
@@ -13,13 +15,20 @@ public class ApplicationManager {
     private LoginHelper auth;
     private OrderHelper order;
 
-    public ApplicationManager() {
+    private ApplicationManager() {
         driver = new ChromeDriver();
         baseUrl = "https://demowebshop.tricentis.com/";
 
         navigation = new NavigationHelper(this, baseUrl);
         auth = new LoginHelper(this);
         order = new OrderHelper(this);
+    }
+
+    public static ApplicationManager getInstance() {
+        if (app.get() == null) {
+            app.set(new ApplicationManager());
+        }
+        return app.get();
     }
 
     public WebDriver getDriver() {
@@ -36,9 +45,5 @@ public class ApplicationManager {
 
     public OrderHelper getOrder() {
         return order;
-    }
-
-    public void stop() {
-        driver.quit();
     }
 }
